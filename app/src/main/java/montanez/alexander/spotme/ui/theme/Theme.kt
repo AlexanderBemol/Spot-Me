@@ -1,9 +1,7 @@
 package montanez.alexander.spotme.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 
 
@@ -84,3 +82,11 @@ fun SpotMeTheme(
         content = content
     )
 }
+
+@Composable
+fun getCustomCardColors() = CardDefaults.cardColors(
+    containerColor = MaterialTheme.colorScheme.surface,
+    contentColor = MaterialTheme.colorScheme.onSurface,
+    disabledContainerColor = MaterialTheme.colorScheme.background,
+    disabledContentColor = MaterialTheme.colorScheme.onSurface
+)
