@@ -1,5 +1,6 @@
 package montanez.alexander.spotme.ui.views.home
 
+import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.animation.core.tween
@@ -12,26 +13,42 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import montanez.alexander.spotme.R
+import montanez.alexander.spotme.data.model.Artist
+import montanez.alexander.spotme.data.model.Track
 import montanez.alexander.spotme.ui.components.TimeFilterChipsComponent
 import montanez.alexander.spotme.ui.theme.SpotMeTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopArtistsContent(paddingValues: PaddingValues) {
+fun TopArtistsContent(
+    paddingValues: PaddingValues,
+    viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    context: Context = LocalContext.current
+) {
+
+    LaunchedEffect(key1 = Unit){
+        coroutineScope.launch {
+            viewModel.getListOfTopArtists(context)
+        }
+    }
+
     Column(Modifier.padding(paddingValues)) {
         Spacer(modifier = Modifier.size(16.dp))
         Text(
@@ -47,19 +64,17 @@ fun TopArtistsContent(paddingValues: PaddingValues) {
         )
         Spacer(modifier = Modifier.size(8.dp))
 
-        val listOfTopArtists = remember { getDemoTopArtistsList() }
-
         TimeFilterChipsComponent {
-            listOfTopArtists.shuffle()
+            viewModel.shuffleTopArtists()
         }
 
         Spacer(modifier = Modifier.size(16.dp))
         LazyColumn{
             items(
-                items = listOfTopArtists,
-                key = {it}
-            ){ number  ->
-                TopArtistRow(number, Modifier.animateItemPlacement(
+                items = viewModel.listOfTopArtists,
+                key = {it.id}
+            ){ artist  ->
+                TopArtistRow(artist, Modifier.animateItemPlacement(
                     animationSpec = tween(500)
                 ))
                 Spacer(Modifier.size(8.dp))
@@ -69,13 +84,13 @@ fun TopArtistsContent(paddingValues: PaddingValues) {
 }
 
 @Composable
-fun TopArtistRow(number: String, modifier: Modifier){
+fun TopArtistRow(artist: Artist, modifier: Modifier){
     Row (
         modifier
             .fillMaxWidth()
     ){
         Text(
-            text = "$number°",
+            text = "${artist.id}°",
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold
@@ -87,7 +102,7 @@ fun TopArtistRow(number: String, modifier: Modifier){
         )
         Spacer(modifier = Modifier.size(8.dp))
         Image(
-            painter = painterResource(id = R.drawable.lin_manuel),
+            bitmap = artist.bitmap.asImageBitmap(),
             contentDescription = "Album Cover",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -97,7 +112,7 @@ fun TopArtistRow(number: String, modifier: Modifier){
         )
         Spacer(modifier = Modifier.size(8.dp))
         Text(
-            text = "Lin Manuel Miranda",
+            text = artist.name,
             style = TextStyle(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -106,8 +121,6 @@ fun TopArtistRow(number: String, modifier: Modifier){
         )
     }
 }
-
-private fun getDemoTopArtistsList() = mutableStateListOf("1","2","3","4","5")
 
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Preview(name = "Light Mode", uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)

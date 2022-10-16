@@ -29,7 +29,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import montanez.alexander.spotme.R
-import montanez.alexander.spotme.Routes
+import montanez.alexander.spotme.ui.navigation.Routes
 import montanez.alexander.spotme.ui.theme.*
 
 val defaultLoadedValue = LoginAnimationState.ENTER

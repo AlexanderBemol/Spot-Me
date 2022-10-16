@@ -1,7 +1,8 @@
 package montanez.alexander.spotme.ui.views.home
 
+import android.content.Context
 import android.content.res.Configuration
-import android.view.animation.OvershootInterpolator
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -10,30 +11,43 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import montanez.alexander.spotme.R
+import montanez.alexander.spotme.data.model.Track
 import montanez.alexander.spotme.ui.components.*
 import montanez.alexander.spotme.ui.theme.SpotMeTheme
 
 
-
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeContent(padding: PaddingValues){
-    val listOfRecentTracks = remember { getDemoList() }
+fun HomeContent(
+    padding: PaddingValues,
+    viewModel: HomeViewModel = viewModel(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    context: Context = LocalContext.current
+){
+
+    Log.d("Testeo","Recompose Home")
+
+    LaunchedEffect(key1 = Unit){
+        coroutineScope.launch {
+            viewModel.getListOfRecentTracks(context)
+        }
+    }
 
     Column(
         Modifier
@@ -64,7 +78,7 @@ fun HomeContent(padding: PaddingValues){
                         MaterialTheme.colorScheme.surface,
                         if(isSystemInDarkTheme()) getPaletteFromBitmap().darkMutedSwatch?.rgbAsColor()
                             ?: MaterialTheme.colorScheme.surface
-                        else getPaletteFromBitmap().lightMutedSwatch?.rgbAsColor()
+                        else getPaletteFromBitmap().mutedSwatch?.rgbAsColor()
                             ?: MaterialTheme.colorScheme.surface
                     ),
                     280f
@@ -85,16 +99,14 @@ fun HomeContent(padding: PaddingValues){
             ),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        SideEffect {
-            listOfRecentTracks.shuffle()
-        }
+
         LazyColumn{
             items(
-                listOfRecentTracks,
-                key = {it}
-            ){ text  ->
+                viewModel.listOfRecentTracks,
+                key = {it.id}
+            ){ track  ->
                 TrackCard(
-                    "Johanna",
+                    track,
                     Modifier.animateItemPlacement(
                         animationSpec = tween(
                             durationMillis = 500,
@@ -186,14 +198,14 @@ fun NowPlayingCard(){
 }
 
 @Composable
-fun TrackCard(title: String, modifier: Modifier){
+fun TrackCard(track: Track, modifier: Modifier){
     Row(
         modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.sweeney_cover),
+            bitmap = track.albumArt.asImageBitmap(),
             contentDescription = "Album Cover",
             contentScale = ContentScale.FillBounds,
             modifier = Modifier
@@ -207,14 +219,14 @@ fun TrackCard(title: String, modifier: Modifier){
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = title,
+                text = track.name,
                 style = TextStyle(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
             )
             Text(
-                text = "Stephen Sondheim, Edmund Lyndeck",
+                text = track.artists,
                 style = TextStyle(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Normal
@@ -223,8 +235,6 @@ fun TrackCard(title: String, modifier: Modifier){
         }
     }
 }
-
-private fun getDemoList() = mutableStateListOf("Johanna1","Johanna2","Johanna3","Johanna4","Johanna5")
 
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Preview(name = "Light Mode", uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)

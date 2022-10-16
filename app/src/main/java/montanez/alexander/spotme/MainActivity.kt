@@ -2,7 +2,6 @@ package montanez.alexander.spotme
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContentScope
@@ -15,11 +14,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import montanez.alexander.spotme.ui.navigation.Routes
 import montanez.alexander.spotme.ui.theme.*
 import montanez.alexander.spotme.ui.views.home.HomeView
 import montanez.alexander.spotme.ui.views.login.LoginView

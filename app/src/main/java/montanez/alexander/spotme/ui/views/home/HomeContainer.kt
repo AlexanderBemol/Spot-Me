@@ -1,6 +1,7 @@
 package montanez.alexander.spotme.ui.views.home
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import montanez.alexander.spotme.R
 import montanez.alexander.spotme.ui.theme.SpotMeTheme
-import montanez.alexander.spotme.ui.views.navigation.HomeNavGraph
+import montanez.alexander.spotme.ui.navigation.HomeNavGraph
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -25,6 +26,7 @@ fun HomeView(navController: NavHostController = rememberAnimatedNavController())
     Scaffold(
         bottomBar = { BottomBar(navController) }
     ) {
+        Log.d("Testeo","Recompose Home Container")
         HomeNavGraph(it,navController)
     }
 }
